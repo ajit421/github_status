@@ -82,6 +82,9 @@ route.get("/", async (c) => {
 
     return new Response(svg, { headers: SVG_OK });
   } catch (err) {
+    console.error(`[stats] Fatal error handling request for ${username}:`, err);
+    console.error(err instanceof Error ? err.stack : err);
+    
     const message =
       err instanceof Error ? err.message : "Failed to fetch GitHub stats";
     const svg = await errorSvg(message, theme);

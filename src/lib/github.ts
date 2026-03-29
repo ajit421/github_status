@@ -3,12 +3,17 @@
 const BASE_URL = "https://api.github.com";
 
 function defaultHeaders(): Record<string, string> {
-  return {
+  const headers: Record<string, string> = {
     Accept: "application/vnd.github+json",
     "X-GitHub-Api-Version": "2022-11-28",
     "User-Agent": "github-stats-api/1.0",
-    Authorization: `Bearer ${process.env.GITHUB_TOKEN ?? ""}`,
   };
+
+  if (process.env.GITHUB_TOKEN) {
+    headers["Authorization"] = `Bearer ${process.env.GITHUB_TOKEN}`;
+  }
+
+  return headers;
 }
 
 /**

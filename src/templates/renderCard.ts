@@ -11,29 +11,40 @@ let regularFontCache: ArrayBuffer | null = null;
 let semiBoldFontCache: ArrayBuffer | null = null;
 
 async function loadFonts(): Promise<[ArrayBuffer, ArrayBuffer]> {
-  const [regular, semiBold] = await Promise.all([
-    regularFontCache
-      ? Promise.resolve(regularFontCache)
-      : fetch(
-          "https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2"
-        )
-          .then((r) => r.arrayBuffer())
-          .then((buf) => {
-            regularFontCache = buf;
-            return buf;
-          }),
-    semiBoldFontCache
-      ? Promise.resolve(semiBoldFontCache)
-      : fetch(
-          "https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuFmUUE.woff2"
-        )
-          .then((r) => r.arrayBuffer())
-          .then((buf) => {
-            semiBoldFontCache = buf;
-            return buf;
-          }),
-  ]);
-  return [regular, semiBold];
+  try {
+    const [regular, semiBold] = await Promise.all([
+      regularFontCache
+        ? Promise.resolve(regularFontCache)
+        : fetch(
+            "https://unpkg.com/@fontsource/inter@5.0.19/files/inter-latin-400-normal.woff"
+          )
+            .then((r) => {
+              if (!r.ok) throw new Error(`Failed to fetch Regular font: ${r.status}`);
+              return r.arrayBuffer();
+            })
+            .then((buf) => {
+              regularFontCache = buf;
+              return buf;
+            }),
+      semiBoldFontCache
+        ? Promise.resolve(semiBoldFontCache)
+        : fetch(
+            "https://unpkg.com/@fontsource/inter@5.0.19/files/inter-latin-600-normal.woff"
+          )
+            .then((r) => {
+              if (!r.ok) throw new Error(`Failed to fetch SemiBold font: ${r.status}`);
+              return r.arrayBuffer();
+            })
+            .then((buf) => {
+              semiBoldFontCache = buf;
+              return buf;
+            }),
+    ]);
+    return [regular, semiBold];
+  } catch (err) {
+    console.error("[renderCard] Error loading fonts:", err);
+    throw err;
+  }
 }
 
 // ── renderCard ────────────────────────────────────────────────────────────────

@@ -2,24 +2,26 @@
 import { Redis } from "@upstash/redis";
 
 // ── Client initialisation ─────────────────────────────────────────────────────
-// Validated eagerly so a misconfigured deployment fails loudly at startup
-// rather than silently at the first cache call.
+// Initialised lazily so a missing environment variable does not crash the app
+// at startup. If missing, caching is bypassed gracefully.
 
-const url = process.env.UPSTASH_REDIS_REST_URL;
-const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+let redisClient: Redis | null = null;
 
-if (!url) {
-  throw new Error(
-    "[cache] Missing required environment variable: UPSTASH_REDIS_REST_URL"
-  );
+function getRedis(): Redis | null {
+  if (redisClient !== null) return redisClient;
+
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  if (!url || !token) {
+    console.warn("[cache] Upstash Redis credentials missing! Caching disabled.");
+    // Return null and let caller handle cache miss natively
+    return null;
+  }
+
+  redisClient = new Redis({ url, token });
+  return redisClient;
 }
-if (!token) {
-  throw new Error(
-    "[cache] Missing required environment variable: UPSTASH_REDIS_REST_TOKEN"
-  );
-}
-
-const redis = new Redis({ url, token });
 
 // ── TTL constants ─────────────────────────────────────────────────────────────
 
@@ -69,10 +71,14 @@ export async function withCache<T>(
 ): Promise<T> {
   // ── Attempt cache read ───────────────────────────────────────────────────────
   let cached: string | null = null;
-  try {
-    cached = await redis.get<string>(key);
-  } catch (err) {
-    console.warn(`[cache] Redis GET failed for key "${key}":`, err);
+  const redis = getRedis();
+
+  if (redis) {
+    try {
+      cached = await redis.get<string>(key);
+    } catch (err) {
+      console.warn(`[cache] Redis GET failed for key "${key}":`, err);
+    }
   }
 
   if (cached !== null) {
@@ -88,10 +94,12 @@ export async function withCache<T>(
   const result = await fetcher();
 
   // ── Attempt cache write (best-effort, never throws) ──────────────────────────
-  try {
-    await redis.set(key, JSON.stringify(result), { ex: ttlSeconds });
-  } catch (err) {
-    console.warn(`[cache] Redis SET failed for key "${key}":`, err);
+  if (redis) {
+    try {
+      await redis.set(key, JSON.stringify(result), { ex: ttlSeconds });
+    } catch (err) {
+      console.warn(`[cache] Redis SET failed for key "${key}":`, err);
+    }
   }
 
   return result;
