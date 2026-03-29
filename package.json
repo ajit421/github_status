@@ -1,23 +1,39 @@
 {
   "name": "github-stats-api",
   "version": "1.0.0",
-  "description": "GitHub Stats API Service",
-  "main": "server.js",
+  "description": "GitHub Stats API — Hono.js on Vercel Edge Functions",
+  "private": true,
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc --noEmit",
+    "start": "node dist/index.js",
+    "deploy": "vercel deploy --prod",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.11",
+    "@upstash/redis": "^1.37.0",
+    "@vercel/og": "^0.6.8",
+    "hono": "^4.12.9",
+    "react": "^19.2.4",
+    "satori": "^0.12.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.15",
+    "@types/react": "^19.2.14",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.78.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ajit421/github_status.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "axios": "^1.13.5",
-    "cors": "^2.8.6",
-    "dotenv": "^16.6.1",
-    "express": "^4.22.1",
-    "node-cache": "^5.1.2"
+  "bugs": {
+    "url": "https://github.com/ajit421/github_status/issues"
   },
-  "devDependencies": {
-    "nodemon": "^3.0.1"
-  }
+  "homepage": "https://github.com/ajit421/github_status#readme"
 }
