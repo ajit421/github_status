@@ -1,9 +1,14 @@
 // src/index.ts
 import { Hono } from "hono";
+import { handle } from "hono/vercel";
 import stats from "@/routes/stats";
 import langs from "@/routes/langs";
 import streak from "@/routes/streak";
 import activity from "@/routes/activity";
+
+// ── Runtime declaration (Vercel Edge) ─────────────────────────────────────────
+// Vercel reads this export to select the Edge runtime for this function.
+export const config = { runtime: "edge" };
 
 // ── App ───────────────────────────────────────────────────────────────────────
 
@@ -29,9 +34,7 @@ app.route("/api/streak", streak);
 app.route("/api/commit-activity", activity);
 
 // ── Local dev (Node.js) ───────────────────────────────────────────────────────
-// Only runs in non-production environments (i.e. `npm run dev`).
-// The Edge runtime entry point is the default export below.
-
+// Only runs when executed directly via `npm run dev` (tsx watch).
 if (process.env.NODE_ENV !== "production") {
   import("@hono/node-server").then(({ serve }) => {
     const port = Number(process.env.PORT ?? 3000);
@@ -41,6 +44,5 @@ if (process.env.NODE_ENV !== "production") {
   });
 }
 
-// ── Edge runtime export ───────────────────────────────────────────────────────
-
-export default app;
+// ── Vercel Edge export ────────────────────────────────────────────────────────
+export default handle(app);
