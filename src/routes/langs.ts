@@ -1,11 +1,11 @@
 // src/routes/langs.ts
 import { Hono } from "hono";
-import { getTopLanguages } from "@/services/languageService";
-import { withCache, buildCacheKey, CACHE_TTL } from "@/lib/cache";
-import { LanguageCard } from "@/templates/LanguageCard";
-import { ErrorCard } from "@/templates/ErrorCard";
-import { renderCard } from "@/templates/renderCard";
-import { THEMES, type ThemeName } from "@/lib/themes";
+import { getTopLanguages } from '../services/languageService';
+import { withCache, buildCacheKey, CACHE_TTL } from '../lib/cache';
+import { LanguageCard } from '../templates/LanguageCard';
+import { ErrorCard } from '../templates/ErrorCard';
+import { renderCard } from '../templates/renderCard';
+import { THEMES, type ThemeName } from '../lib/themes';
 
 const route = new Hono();
 

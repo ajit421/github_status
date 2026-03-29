@@ -1,11 +1,11 @@
 // src/routes/activity.ts
 import { Hono } from "hono";
-import { fetchCommitActivity } from "@/services/activityService";
-import { withCache, buildCacheKey, CACHE_TTL } from "@/lib/cache";
-import { ActivityCard } from "@/templates/ActivityCard";
-import { ErrorCard } from "@/templates/ErrorCard";
-import { renderCard } from "@/templates/renderCard";
-import { THEMES, type ThemeName } from "@/lib/themes";
+import { fetchCommitActivity } from '../services/activityService';
+import { withCache, buildCacheKey, CACHE_TTL } from '../lib/cache';
+import { ActivityCard } from '../templates/ActivityCard';
+import { ErrorCard } from '../templates/ErrorCard';
+import { renderCard } from '../templates/renderCard';
+import { THEMES, type ThemeName } from '../lib/themes';
 
 const route = new Hono();
 

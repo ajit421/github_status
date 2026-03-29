@@ -1,11 +1,11 @@
 // src/services/statsService.ts
-import { githubFetch } from "@/lib/github";
+import { githubFetch } from '../lib/github';
 import type {
   GitHubUser,
   GitHubRepo,
   CommitSearchResult,
   StatsData,
-} from "@/types/github";
+} from '../types/github';
 
 interface IssueSearchResult {
   total_count: number;

@@ -1,11 +1,11 @@
 // src/routes/streak.ts
 import { Hono } from "hono";
-import { fetchContributionData } from "@/services/contributionService";
-import { withCache, buildCacheKey, CACHE_TTL } from "@/lib/cache";
-import { StreakCard } from "@/templates/StreakCard";
-import { ErrorCard } from "@/templates/ErrorCard";
-import { renderCard } from "@/templates/renderCard";
-import { THEMES, type ThemeName } from "@/lib/themes";
+import { fetchContributionData } from '../services/contributionService';
+import { withCache, buildCacheKey, CACHE_TTL } from '../lib/cache';
+import { StreakCard } from '../templates/StreakCard';
+import { ErrorCard } from '../templates/ErrorCard';
+import { renderCard } from '../templates/renderCard';
+import { THEMES, type ThemeName } from '../lib/themes';
 
 const route = new Hono();
 

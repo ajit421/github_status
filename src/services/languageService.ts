@@ -1,6 +1,6 @@
 // src/services/languageService.ts
-import { githubFetch } from "@/lib/github";
-import type { GitHubRepo, LanguageData } from "@/types/github";
+import { githubFetch } from '../lib/github';
+import type { GitHubRepo, LanguageData } from '../types/github';
 
 /** Bytes-per-language response from /repos/:owner/:repo/languages */
 type LangBytesMap = Record<string, number>;

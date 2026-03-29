@@ -1,8 +1,8 @@
 // src/templates/ActivityCard.tsx
 /** @jsxImportSource react */
 
-import { THEMES, type ThemeName } from "@/lib/themes";
-import type { ActivityData } from "@/types/github";
+import { THEMES, type ThemeName } from '../lib/themes';
+import type { ActivityData } from '../types/github';
 
 export interface ActivityCardProps {
   activity: ActivityData;

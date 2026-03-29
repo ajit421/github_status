@@ -1,11 +1,11 @@
 // src/routes/stats.ts
 import { Hono } from "hono";
-import { getStats } from "@/services/statsService";
-import { withCache, buildCacheKey, CACHE_TTL } from "@/lib/cache";
-import { StatsCard } from "@/templates/StatsCard";
-import { ErrorCard } from "@/templates/ErrorCard";
-import { renderCard } from "@/templates/renderCard";
-import { THEMES, type ThemeName } from "@/lib/themes";
+import { getStats } from '../services/statsService';
+import { withCache, buildCacheKey, CACHE_TTL } from '../lib/cache';
+import { StatsCard } from '../templates/StatsCard';
+import { ErrorCard } from '../templates/ErrorCard';
+import { renderCard } from '../templates/renderCard';
+import { THEMES, type ThemeName } from '../lib/themes';
 
 const route = new Hono();
 

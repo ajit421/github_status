@@ -3,7 +3,7 @@ import type {
   GraphQLContributionResponse,
   ContributionDay,
   StreakData,
-} from "@/types/github";
+} from '../types/github';
 
 const GRAPHQL_URL = "https://api.github.com/graphql";
 

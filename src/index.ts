@@ -1,10 +1,10 @@
 // src/index.ts
 import { Hono } from "hono";
 import { handle } from "hono/vercel";
-import stats from "@/routes/stats";
-import langs from "@/routes/langs";
-import streak from "@/routes/streak";
-import activity from "@/routes/activity";
+import stats from './routes/stats';
+import langs from './routes/langs';
+import streak from './routes/streak';
+import activity from './routes/activity';
 
 // ── Runtime declaration (Vercel Edge) ─────────────────────────────────────────
 // Vercel reads this export to select the Edge runtime for this function.

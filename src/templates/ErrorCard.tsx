@@ -1,7 +1,7 @@
 // src/templates/ErrorCard.tsx
 /** @jsxImportSource react */
 
-import { THEMES, type ThemeName } from "@/lib/themes";
+import { THEMES, type ThemeName } from '../lib/themes';
 
 export interface ErrorCardProps {
   message: string;

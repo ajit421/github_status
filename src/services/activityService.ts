@@ -1,6 +1,6 @@
 // src/services/activityService.ts
-import { githubFetch } from "@/lib/github";
-import type { GitHubRepo, ActivityData } from "@/types/github";
+import { githubFetch } from '../lib/github';
+import type { GitHubRepo, ActivityData } from '../types/github';
 
 interface GitHubCommit {
   commit: {

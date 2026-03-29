@@ -1,8 +1,8 @@
 // src/templates/LanguageCard.tsx
 /** @jsxImportSource react */
 
-import { THEMES, type ThemeName } from "@/lib/themes";
-import type { LanguageData } from "@/types/github";
+import { THEMES, type ThemeName } from '../lib/themes';
+import type { LanguageData } from '../types/github';
 
 export interface LanguageCardProps {
   languages: LanguageData;

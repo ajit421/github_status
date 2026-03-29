@@ -1,8 +1,8 @@
 // src/templates/StreakCard.tsx
 /** @jsxImportSource react */
 
-import { THEMES, type ThemeName } from "@/lib/themes";
-import type { StreakData } from "@/types/github";
+import { THEMES, type ThemeName } from '../lib/themes';
+import type { StreakData } from '../types/github';
 
 export interface StreakCardProps {
   streakData: StreakData;

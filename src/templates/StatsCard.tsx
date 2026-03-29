@@ -1,8 +1,8 @@
 // src/templates/StatsCard.tsx
 /** @jsxImportSource react */
 
-import { THEMES, type ThemeName } from "@/lib/themes";
-import type { StatsData } from "@/types/github";
+import { THEMES, type ThemeName } from '../lib/themes';
+import type { StatsData } from '../types/github';
 
 // ── GitHub Octicon SVG paths (16×16 viewBox) ─────────────────────────────────
 
