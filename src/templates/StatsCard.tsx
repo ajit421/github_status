@@ -1,5 +1,5 @@
 // src/templates/StatsCard.tsx
-/** @jsxImportSource react */
+/** @jsxImportSource hono/jsx */
 
 import { THEMES, type ThemeName } from '../lib/themes';
 import type { StatsData } from '../types/github';
@@ -107,6 +107,7 @@ function RankCircle({
         justifyContent: "center",
         width: 100,
         flexShrink: 0,
+        position: "relative",
       }}
     >
       <svg width={100} height={100} viewBox="0 0 100 100">
@@ -133,31 +134,29 @@ function RankCircle({
           strokeLinecap="round"
           transform="rotate(-90 50 50)"
         />
-        <text
-          x={50}
-          y={45}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          fontSize={22}
-          fontWeight={700}
-          fill={textColor}
-          fontFamily="Inter"
-        >
-          {rank}
-        </text>
-        <text
-          x={50}
-          y={63}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          fontSize={10}
-          fill={textColor}
-          fontFamily="Inter"
-          fillOpacity={0.7}
-        >
-          RANK
-        </text>
       </svg>
+      {/* Text overlay — Satori does not support SVG <text> nodes */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: 100,
+          height: 100,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 2,
+        }}
+      >
+        <span style={{ fontSize: 22, fontWeight: 700, color: textColor, fontFamily: "Inter" }}>
+          {rank}
+        </span>
+        <span style={{ fontSize: 10, color: textColor, fontFamily: "Inter", opacity: 0.7 }}>
+          RANK
+        </span>
+      </div>
     </div>
   );
 }

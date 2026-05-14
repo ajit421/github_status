@@ -1,5 +1,5 @@
 // src/templates/StreakCard.tsx
-/** @jsxImportSource react */
+/** @jsxImportSource hono/jsx */
 
 import { THEMES, type ThemeName } from '../lib/themes';
 import type { StreakData } from '../types/github';
@@ -69,6 +69,7 @@ function RingProgress({
         alignItems: "center",
         justifyContent: "center",
         flex: 1,
+        position: "relative",
       }}
     >
       <svg width={110} height={110} viewBox="0 0 110 110">
@@ -95,34 +96,31 @@ function RingProgress({
           strokeDashoffset={circumference * 0.25}
           transform="rotate(-90 55 55)"
         />
-        {/* Fire emoji stand-in — coloured dot */}
+        {/* Fire dot indicator */}
         <circle cx={55} cy={34} r={6} fill={fireColor} />
-        {/* Streak number */}
-        <text
-          x={55}
-          y={55}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          fontSize={22}
-          fontWeight={700}
-          fill={textColor}
-          fontFamily="Inter"
-        >
-          {streak}
-        </text>
-        <text
-          x={55}
-          y={72}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          fontSize={10}
-          fill={textColor}
-          fontFamily="Inter"
-          fillOpacity={0.65}
-        >
-          day streak
-        </text>
       </svg>
+      {/* Text overlay — Satori does not support SVG <text> nodes */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: 110,
+          height: 110,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 2,
+        }}
+      >
+        <span style={{ fontSize: 22, fontWeight: 700, color: textColor, fontFamily: "Inter" }}>
+          {streak}
+        </span>
+        <span style={{ fontSize: 10, color: textColor, fontFamily: "Inter", opacity: 0.65 }}>
+          day streak
+        </span>
+      </div>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 // src/templates/LanguageCard.tsx
-/** @jsxImportSource react */
+/** @jsxImportSource hono/jsx */
 
 import { THEMES, type ThemeName } from '../lib/themes';
 import type { LanguageData } from '../types/github';

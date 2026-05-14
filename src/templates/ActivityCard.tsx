@@ -1,5 +1,5 @@
 // src/templates/ActivityCard.tsx
-/** @jsxImportSource react */
+/** @jsxImportSource hono/jsx */
 
 import { THEMES, type ThemeName } from '../lib/themes';
 import type { ActivityData } from '../types/github';

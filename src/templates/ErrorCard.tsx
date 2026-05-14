@@ -1,5 +1,5 @@
 // src/templates/ErrorCard.tsx
-/** @jsxImportSource react */
+/** @jsxImportSource hono/jsx */
 
 import { THEMES, type ThemeName } from '../lib/themes';
 

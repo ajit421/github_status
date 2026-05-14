@@ -1,0 +1,27 @@
+name            = "github-stats-api"
+main            = "src/index.ts"
+compatibility_date  = "2025-05-01"
+
+# nodejs_compat gives you TextEncoder, URL, crypto, etc. in Workers
+compatibility_flags = ["nodejs_compat"]
+
+# ── Secrets ───────────────────────────────────────────────────────────────────
+# DO NOT put secrets here. Set them with:
+#   wrangler secret put GITHUB_TOKEN
+# Wrangler will encrypt and deploy them; they appear as c.env.GITHUB_TOKEN at runtime.
+
+# ── Public vars (non-secret, baked into the deployment) ───────────────────────
+[vars]
+# Example: APP_VERSION = "2.0.0"
+
+# ── Optional: Cloudflare KV namespace ─────────────────────────────────────────
+# Uncomment ONLY if you add persistent structured data that needs KV.
+# The Cache API is sufficient for SVG caching and is completely free.
+#
+# [[kv_namespaces]]
+# binding = "STATS_KV"
+# id      = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID_HERE"
+
+# ── Local dev overrides ───────────────────────────────────────────────────────
+[dev]
+port = 8787
