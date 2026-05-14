@@ -1,51 +1,25 @@
 // src/lib/cache.ts
-import { Redis } from "@upstash/redis";
 
-// ── Client initialisation ─────────────────────────────────────────────────────
-// Initialised lazily so a missing environment variable does not crash the app
-// at startup. If missing, caching is bypassed gracefully.
-
-let redisClient: Redis | null = null;
-
-function getRedis(): Redis | null {
-  if (redisClient !== null) return redisClient;
-
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-
-  if (!url || !token) {
-    console.warn("[cache] Upstash Redis credentials missing! Caching disabled.");
-    // Return null and let caller handle cache miss natively
-    return null;
-  }
-
-  redisClient = new Redis({ url, token });
-  return redisClient;
-}
-
-// ── TTL constants ─────────────────────────────────────────────────────────────
-
+// ── TTL constants (seconds) ───────────────────────────────────────────────────
 export const CACHE_TTL = {
-  STATS: 14400,     // 4 hours
-  LANGUAGES: 7200,  // 2 hours
-  STREAK: 7200,     // 2 hours
-  ACTIVITY: 7200,   // 2 hours
+  STATS:     14400, // 4 hours
+  LANGUAGES:  7200, // 2 hours
+  STREAK:     7200, // 2 hours
+  ACTIVITY:   7200, // 2 hours
 } as const;
 
-// ── Cache key builder ─────────────────────────────────────────────────────────
-
 /**
- * Builds a deterministic cache key that includes all query params affecting
- * the output, so different query combinations never collide.
+ * Builds a deterministic, URL-safe cache key string.
+ * Keys are sorted alphabetically so param order never creates duplicate entries.
  *
- * Example: buildCacheKey("stats", { username: "octocat", theme: "dark" })
- *          → 'stats:{"theme":"dark","username":"octocat"}'
+ * Example:
+ *   buildCacheKey("stats", { username: "octocat", theme: "dark" })
+ *   → 'stats:{"theme":"dark","username":"octocat"}'
  */
 export function buildCacheKey(
   prefix: string,
   params: Record<string, string | undefined>
 ): string {
-  // Sort keys so param order never creates duplicate cache entries.
   const stable = Object.fromEntries(
     Object.entries(params)
       .filter(([, v]) => v !== undefined)
@@ -54,52 +28,60 @@ export function buildCacheKey(
   return `${prefix}:${JSON.stringify(stable)}`;
 }
 
-// ── Generic cache wrapper ─────────────────────────────────────────────────────
-
 /**
- * Cache-aside wrapper.
+ * Cache-aside wrapper using the Cloudflare Cache API.
  *
- * 1. Try Redis GET. On hit, parse JSON and return typed T.
- * 2. On miss, call fetcher(), write result to Redis with EX ttlSeconds, return it.
- * 3. If Redis throws at ANY point, log a warning and fall through to fetcher().
- *    Redis errors must NEVER crash the API.
+ * ── How it works ─────────────────────────────────────────────────────────────
+ * The Cache API works with Request/Response pairs, keyed by URL.
+ * We create a synthetic HTTPS URL from the cache key string to use as the key.
+ * TTL is enforced by setting `Cache-Control: max-age=N` on the stored Response —
+ * Cloudflare honours this and automatically evicts entries when they expire.
+ *
+ * ── Graceful degradation ─────────────────────────────────────────────────────
+ * Cache read/write errors are caught and logged. They NEVER throw or crash the
+ * request handler. If the cache is unavailable, the fetcher is called directly.
+ *
+ * ── Local dev ────────────────────────────────────────────────────────────────
+ * `wrangler dev` simulates the Cache API in memory. It works the same as
+ * production but does not persist across dev server restarts.
  */
-export async function withCache<T>(
+export async function withCache(
   key: string,
   ttlSeconds: number,
-  fetcher: () => Promise<T>
-): Promise<T> {
-  // ── Attempt cache read ───────────────────────────────────────────────────────
-  let cached: string | null = null;
-  const redis = getRedis();
+  fetcher: () => Promise<string>
+): Promise<string> {
+  const cache = caches.default;
 
-  if (redis) {
-    try {
-      cached = await redis.get<string>(key);
-    } catch (err) {
-      console.warn(`[cache] Redis GET failed for key "${key}":`, err);
+  // Synthetic URL: must be a valid HTTPS URL. The hostname is fictional but valid.
+  // encodeURIComponent handles colons, braces, quotes, spaces in the key string.
+  const cacheUrl = `https://github-stats-cache.internal/v1/${encodeURIComponent(key)}`;
+
+  // ── 1. Attempt cache read ─────────────────────────────────────────────────
+  try {
+    const cachedResponse = await cache.match(cacheUrl);
+    if (cachedResponse) {
+      return cachedResponse.text();
     }
+  } catch (err) {
+    console.warn(`[cache] Read failed for key "${key}":`, err);
   }
 
-  if (cached !== null) {
-    try {
-      return JSON.parse(cached) as T;
-    } catch {
-      // Corrupt/unexpected cache value — treat as a miss.
-      console.warn(`[cache] Failed to parse cached value for key "${key}"`);
-    }
-  }
-
-  // ── Cache miss — call the real data source ───────────────────────────────────
+  // ── 2. Cache miss — call the real data source ─────────────────────────────
   const result = await fetcher();
 
-  // ── Attempt cache write (best-effort, never throws) ──────────────────────────
-  if (redis) {
-    try {
-      await redis.set(key, JSON.stringify(result), { ex: ttlSeconds });
-    } catch (err) {
-      console.warn(`[cache] Redis SET failed for key "${key}":`, err);
-    }
+  // ── 3. Write to cache (best-effort) ──────────────────────────────────────
+  try {
+    await cache.put(
+      cacheUrl,
+      new Response(result, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': `public, max-age=${ttlSeconds}`,
+        },
+      })
+    );
+  } catch (err) {
+    console.warn(`[cache] Write failed for key "${key}":`, err);
   }
 
   return result;

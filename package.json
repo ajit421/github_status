@@ -1,39 +1,19 @@
 {
   "name": "github-stats-api",
-  "version": "1.0.0",
-  "description": "GitHub Stats API — Hono.js on Vercel Edge Functions",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc --noEmit",
-    "start": "node dist/index.js",
-    "deploy": "vercel deploy --prod",
-    "lint": "tsc --noEmit"
+    "dev":        "wrangler dev",
+    "deploy":     "wrangler deploy",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@hono/node-server": "^1.19.11",
-    "@upstash/redis": "^1.37.0",
-    "@vercel/og": "^0.6.8",
-    "hono": "^4.12.9",
-    "react": "^19.2.4",
+    "hono":   "^4.12.9",
     "satori": "^0.12.2"
   },
   "devDependencies": {
-    "@types/node": "^22.19.15",
-    "@types/react": "^19.2.14",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.3",
-    "wrangler": "^4.78.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ajit421/github_status.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/ajit421/github_status/issues"
-  },
-  "homepage": "https://github.com/ajit421/github_status#readme"
+    "@cloudflare/workers-types": "^4.20260317.1",
+    "typescript":                "^5.9.3",
+    "wrangler":                  "^4.78.0"
+  }
 }

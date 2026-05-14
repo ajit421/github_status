@@ -1,48 +1,35 @@
 // src/index.ts
-import { Hono } from "hono";
-import { handle } from "hono/vercel";
-import stats from './routes/stats';
-import langs from './routes/langs';
-import streak from './routes/streak';
-import activity from './routes/activity';
+import { Hono } from 'hono';
+import type { Env } from './types/bindings';
+import statsRoute    from './routes/stats';
+import langsRoute    from './routes/langs';
+import streakRoute   from './routes/streak';
+import activityRoute from './routes/activity';
 
-// ── Runtime declaration (Vercel Edge) ─────────────────────────────────────────
-// Vercel reads this export to select the Edge runtime for this function.
-export const config = { runtime: "edge" };
+const app = new Hono<{ Bindings: Env }>();
 
-// ── App ───────────────────────────────────────────────────────────────────────
-
-const app = new Hono();
-
-// Health check
-app.get("/", (c) =>
+// ── Health check ──────────────────────────────────────────────────────────────
+app.get('/', (c) =>
   c.json({
-    status: "OK",
+    status:  'OK',
+    runtime: 'Cloudflare Workers',
     endpoints: [
-      "/api/stats",
-      "/api/top-langs",
-      "/api/streak",
-      "/api/commit-activity",
+      '/api/stats',
+      '/api/top-langs',
+      '/api/streak',
+      '/api/commit-activity',
     ],
   })
 );
 
-// Card routes
-app.route("/api/stats", stats);
-app.route("/api/top-langs", langs);
-app.route("/api/streak", streak);
-app.route("/api/commit-activity", activity);
+// ── Card routes ───────────────────────────────────────────────────────────────
+app.route('/api/stats',           statsRoute);
+app.route('/api/top-langs',       langsRoute);
+app.route('/api/streak',          streakRoute);
+app.route('/api/commit-activity', activityRoute);
 
-// ── Local dev (Node.js) ───────────────────────────────────────────────────────
-// Only runs when executed directly via `npm run dev` (tsx watch).
-if (process.env.NODE_ENV !== "production") {
-  import("@hono/node-server").then(({ serve }) => {
-    const port = Number(process.env.PORT ?? 3000);
-    serve({ fetch: app.fetch, port }, () =>
-      console.log(`▲ Local dev server running at http://localhost:${port}`)
-    );
-  });
-}
-
-// ── Vercel Edge export ────────────────────────────────────────────────────────
-export default handle(app);
+// ── Cloudflare Workers export ─────────────────────────────────────────────────
+// Hono's `app` object exposes a `.fetch(request, env, ctx)` method that matches
+// the Cloudflare Workers module handler signature exactly.
+// DO NOT add a Node.js `serve()` call here — it will break in Workers.
+export default app;
