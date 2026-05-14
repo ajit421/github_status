@@ -59,19 +59,19 @@ GITHUB_TOKEN="ghp_your_token_here"
 
 ```bash
 npm run deploy
-# Your live URL: https://github-stats-api.<your-subdomain>.workers.dev
+# Your live URL: https://github-stats-api.421mrdark.workers.dev
 ```
 
 ---
 
 ## 📈 Usage
 
-Replace `YOUR_USERNAME` with your GitHub username and `YOUR_WORKER_URL` with your deployed Worker URL.
+Replace `YOUR_USERNAME` with your GitHub username and `https://github-stats-api.421mrdark.workers.dev` with your deployed Worker URL.
 
 ### 1. GitHub Stats Card
 
 ```markdown
-![GitHub Stats](https://YOUR_WORKER_URL/api/stats?username=YOUR_USERNAME&theme=tokyonight&show_icons=true&hide_border=true)
+![GitHub Stats](https://https://github-stats-api.421mrdark.workers.dev/api/stats?username=YOUR_USERNAME&theme=tokyonight&show_icons=true&hide_border=true)
 ```
 
 | Parameter | Description | Default |
@@ -93,7 +93,7 @@ Replace `YOUR_USERNAME` with your GitHub username and `YOUR_WORKER_URL` with you
 ### 2. Top Languages Card
 
 ```markdown
-![Top Languages](https://YOUR_WORKER_URL/api/top-langs?username=YOUR_USERNAME&theme=tokyonight&layout=pie&hide_border=true)
+![Top Languages](https://https://github-stats-api.421mrdark.workers.dev/api/top-langs?username=YOUR_USERNAME&theme=tokyonight&layout=pie&hide_border=true)
 ```
 
 | Parameter | Description | Default |
@@ -110,7 +110,7 @@ Replace `YOUR_USERNAME` with your GitHub username and `YOUR_WORKER_URL` with you
 > ⚠️ Requires `GITHUB_TOKEN` — uses the GitHub GraphQL API.
 
 ```markdown
-![GitHub Streak](https://YOUR_WORKER_URL/api/streak?username=YOUR_USERNAME&theme=tokyonight&hide_border=true)
+![GitHub Streak](https://https://github-stats-api.421mrdark.workers.dev/api/streak?username=YOUR_USERNAME&theme=tokyonight&hide_border=true)
 ```
 
 | Parameter | Description | Default |
@@ -124,7 +124,7 @@ Replace `YOUR_USERNAME` with your GitHub username and `YOUR_WORKER_URL` with you
 ### 4. Commit Activity Card
 
 ```markdown
-![Commit Activity](https://YOUR_WORKER_URL/api/commit-activity?username=YOUR_USERNAME&theme=tokyonight&hide_border=true)
+![Commit Activity](https://https://github-stats-api.421mrdark.workers.dev/api/commit-activity?username=YOUR_USERNAME&theme=tokyonight&hide_border=true)
 ```
 
 | Parameter | Description | Default |
@@ -151,7 +151,7 @@ Pass as `?theme=tokyonight` on any endpoint.
 Override individual colors with hex codes (no `#`):
 
 ```markdown
-![Custom Stats](https://YOUR_WORKER_URL/api/stats?username=YOUR_USERNAME&bg_color=0d1117&text_color=58a6ff&title_color=58a6ff&icon_color=58a6ff&hide_border=true)
+![Custom Stats](https://https://github-stats-api.421mrdark.workers.dev/api/stats?username=YOUR_USERNAME&bg_color=0d1117&text_color=58a6ff&title_color=58a6ff&icon_color=58a6ff&hide_border=true)
 ```
 
 ---
@@ -219,15 +219,3 @@ src/
     ├── streak.ts
     └── activity.ts
 ```
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Open an issue or submit a pull request.
-
----
-
-## 📄 License
-
-MIT
