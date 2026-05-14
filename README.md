@@ -1,137 +1,233 @@
 # GitHub Stats API
 
-A serverless API to generate dynamic GitHub stats cards for your README.
+> Dynamic GitHub stats cards — built with **Hono** + **Satori**, running on **Cloudflare Workers** free tier 24/7.
 
-> **Deploy your own instance on Vercel for free!**
-
-## 🚀 Deployment
-
-1.  **Fork** this repository.
-2.  **Import** the project to [Vercel](https://vercel.com).
-3.  **Environment Variables**:
-    *   `GITHUB_TOKEN`: Your GitHub Personal Access Token (optional, but recommended to avoid rate limits).
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/ajit421/github_status)
 
 ---
 
-## 📊 Available Cards
+## 📊 Cards
+
+| Card | Endpoint | Auth Required |
+| :--- | :--- | :--- |
+| GitHub Stats | `/api/stats` | Optional |
+| Top Languages | `/api/top-langs` | Optional |
+| Streak Stats | `/api/streak` | **Yes** (GraphQL) |
+| Commit Activity | `/api/commit-activity` | Optional |
+
+---
+
+## 🚀 Deploy Your Own
+
+### Prerequisites
+
+- [Cloudflare account](https://dash.cloudflare.com/sign-up) (free tier is enough)
+- [Node.js](https://nodejs.org) ≥ 18
+- A [GitHub Personal Access Token](https://github.com/settings/tokens) with `read:user` and `repo` scopes
+
+### Step 1 — Clone & Install
+
+```bash
+git clone https://github.com/ajit421/github_status.git
+cd github_status
+npm install
+```
+
+### Step 2 — Set your GitHub Token
+
+```bash
+npx wrangler secret put GITHUB_TOKEN
+# Paste your token when prompted — it is encrypted at rest, never in code.
+```
+
+### Step 3 — Run locally
+
+```bash
+npm run dev
+# → http://localhost:8787
+```
+
+Create `.dev.vars` in the project root for local development:
+
+```ini
+GITHUB_TOKEN="ghp_your_token_here"
+```
+
+> `.dev.vars` is git-ignored. Never commit it.
+
+### Step 4 — Deploy
+
+```bash
+npm run deploy
+# Your live URL: https://github-stats-api.<your-subdomain>.workers.dev
+```
+
+---
+
+## 📈 Usage
+
+Replace `YOUR_USERNAME` with your GitHub username and `YOUR_WORKER_URL` with your deployed Worker URL.
 
 ### 1. GitHub Stats Card
 
-Displays total stars, commits, PRs, issues, and your rank.
-
-**Endpoint:** `/api/stats`
-
-#### Usage
-
 ```markdown
-![GitHub Stats](https://ajit421.vercel.app/api/stats?username=YOUR_USERNAME&theme=tokyonight&hide_border=true&show_icons=true)
+![GitHub Stats](https://YOUR_WORKER_URL/api/stats?username=YOUR_USERNAME&theme=tokyonight&show_icons=true&hide_border=true)
 ```
-
-#### Parameters
 
 | Parameter | Description | Default |
 | :--- | :--- | :--- |
-| `username` | **Required**. Your GitHub username. | - |
-| `hide_rank` | Hides the rank circle. | `false` |
-| `show_icons` | Toggles icons. | `true` |
-| `hide_border` | Hides the card border. | `false` |
-| `custom_title` | Custom text for the card title. | `[Name]'s GitHub Stats` |
-| `theme` | Color theme (see below). | `default` |
+| `username` | **Required.** GitHub username | — |
+| `theme` | Color theme (see [Themes](#-themes)) | `default` |
+| `hide_rank` | Hide the rank circle | `false` |
+| `show_icons` | Show stat icons | `true` |
+| `hide_border` | Hide card border | `false` |
+| `custom_title` | Override card title text | `[Name]'s GitHub Stats` |
+| `bg_color` | Background hex (no `#`) | theme default |
+| `text_color` | Text hex | theme default |
+| `title_color` | Title hex | theme default |
+| `icon_color` | Icon hex | theme default |
+| `border_color` | Border hex | theme default |
 
 ---
 
 ### 2. Top Languages Card
 
-Displays your most used languages.
-
-**Endpoint:** `/api/top-langs`
-
-#### Usage
-
 ```markdown
-![Top Languages](https://ajit421.vercel.app/api/top-langs?username=YOUR_USERNAME&layout=pie&theme=tokyonight&hide_border=true)
+![Top Languages](https://YOUR_WORKER_URL/api/top-langs?username=YOUR_USERNAME&theme=tokyonight&layout=pie&hide_border=true)
 ```
-
-#### Parameters
 
 | Parameter | Description | Default |
 | :--- | :--- | :--- |
-| `username` | **Required**. Your GitHub username. | - |
-| `layout` | Layout style: `normal`, `pie`, `compact` | `normal` |
-| `hide_border` | Hides the card border. | `false` |
-| `theme` | Color theme. | `default` |
+| `username` | **Required.** GitHub username | — |
+| `theme` | Color theme | `default` |
+| `layout` | `normal` · `compact` · `pie` | `normal` |
+| `hide_border` | Hide card border | `false` |
 
 ---
 
 ### 3. Streak Stats Card
 
-Displays your current and longest commit streak.
-
-**Endpoint:** `/api/streak`
-
-#### Usage
+> ⚠️ Requires `GITHUB_TOKEN` — uses the GitHub GraphQL API.
 
 ```markdown
-![GitHub Streak](https://ajit421.vercel.app/api/streak?username=YOUR_USERNAME&theme=tokyonight&hide_border=true)
+![GitHub Streak](https://YOUR_WORKER_URL/api/streak?username=YOUR_USERNAME&theme=tokyonight&hide_border=true)
 ```
-
-#### Parameters
 
 | Parameter | Description | Default |
 | :--- | :--- | :--- |
-| `username` | **Required**. Your GitHub username. | - |
-| `hide_border` | Hides the card border. | `false` |
-| `theme` | Color theme. | `default` |
+| `username` | **Required.** GitHub username | — |
+| `theme` | Color theme | `default` |
+| `hide_border` | Hide card border | `false` |
 
 ---
 
-## 🎨 Customization
+### 4. Commit Activity Card
 
-### Themes
+```markdown
+![Commit Activity](https://YOUR_WORKER_URL/api/commit-activity?username=YOUR_USERNAME&theme=tokyonight&hide_border=true)
+```
 
-Available built-in themes:
-- `default`
-- `dark`
-- `tokyonight`
-- `radical`
+| Parameter | Description | Default |
+| :--- | :--- | :--- |
+| `username` | **Required.** GitHub username | — |
+| `theme` | Color theme | `default` |
+| `hide_border` | Hide card border | `false` |
+
+---
+
+## 🎨 Themes
+
+| Theme | Preview |
+| :--- | :--- |
+| `default` | Light, clean |
+| `dark` | Dark background |
+| `tokyonight` | Purple/blue dark mode |
+| `radical` | Pink/orange gradient |
+
+Pass as `?theme=tokyonight` on any endpoint.
 
 ### Custom Colors
 
-You can customize specific colors by passing hex codes (without `#`):
-
-- `bg_color`: Background color
-- `text_color`: Text color
-- `title_color`: Title color
-- `icon_color`: Icon color
-- `border_color`: Border color
-
-#### Example: Custom Dark Theme
+Override individual colors with hex codes (no `#`):
 
 ```markdown
-![Custom Stats](https://ajit421.vercel.app/api/stats?username=ajit421&bg_color=0d1117&text_color=58a6ff&title_color=58a6ff&icon_color=58a6ff&hide_border=true)
+![Custom Stats](https://YOUR_WORKER_URL/api/stats?username=YOUR_USERNAME&bg_color=0d1117&text_color=58a6ff&title_color=58a6ff&icon_color=58a6ff&hide_border=true)
 ```
 
 ---
 
-## ⚡ Examples
+## ⚙️ How It Works
 
-### Hide Rank
-<img src="https://ajit421.vercel.app/api/stats?username=ajit421&hide_rank=true" height="150" />
+```
+GitHub API → Service → Cloudflare Cache API → Satori (JSX → SVG) → Response
+```
 
-### Hide Border
-<img src="https://ajit421.vercel.app/api/stats?username=ajit421&hide_border=true" height="150" />
+| Layer | Technology | Purpose |
+| :--- | :--- | :--- |
+| Runtime | Cloudflare Workers | Serverless edge compute |
+| Router | Hono | Lightweight HTTP framework |
+| Renderer | Satori | JSX → SVG conversion |
+| Cache | `caches.default` | Edge cache, zero config, zero cost |
+| Font cache | CF Cache API (30-day TTL) | Avoids CDN round-trips for Inter font |
 
-### Custom Colors (Blue & Black)
-<img src="https://ajit421.vercel.app/api/stats?username=ajit421&bg_color=0d1117&text_color=58a6ff&title_color=58a6ff" height="150" />
+### Caching TTLs
 
-### Tokyo Night Theme + Icons
-<img src="https://ajit421.vercel.app/api/stats?username=ajit421&show_icons=true&theme=tokyonight" height="150" />
+| Endpoint | TTL |
+| :--- | :--- |
+| `/api/stats` | 4 hours |
+| `/api/top-langs` | 2 hours |
+| `/api/streak` | 2 hours |
+| `/api/commit-activity` | 2 hours |
 
-### Top Languages (Donut Chart)
-<img src="https://ajit421.vercel.app/api/top-langs?username=ajit421&theme=tokyonight&hide_border=true" height="150" />
+---
 
-### Streak Stats
-<img src="https://ajit421.vercel.app/api/streak?username=ajit421&theme=tokyonight&hide_border=true" height="150" />
+## 🛠️ Local Development
 
-## 🛠️ Contributing
-Contributions are welcome! Please open an issue or submit a pull request.
+```bash
+npm run dev        # Start wrangler dev server at :8787
+npm run deploy     # Bundle and deploy to Cloudflare
+npm run type-check # Run tsc --noEmit
+```
+
+### Project Structure
+
+```
+src/
+├── index.ts              # CF Workers entry point (Hono app)
+├── types/
+│   ├── bindings.d.ts     # Cloudflare env bindings (Env interface)
+│   └── github.d.ts       # GitHub API response types
+├── lib/
+│   ├── github.ts         # Typed fetch wrappers (REST + GraphQL)
+│   ├── cache.ts          # Cloudflare Cache API wrapper
+│   └── themes.ts         # Theme color definitions
+├── services/
+│   ├── statsService.ts
+│   ├── languageService.ts
+│   ├── contributionService.ts
+│   └── activityService.ts
+├── templates/
+│   ├── renderCard.ts     # Satori renderer + font cache
+│   ├── StatsCard.tsx
+│   ├── LanguageCard.tsx
+│   ├── StreakCard.tsx
+│   ├── ActivityCard.tsx
+│   └── ErrorCard.tsx
+└── routes/
+    ├── stats.ts
+    ├── langs.ts
+    ├── streak.ts
+    └── activity.ts
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Open an issue or submit a pull request.
+
+---
+
+## 📄 License
+
+MIT
