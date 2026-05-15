@@ -23,26 +23,30 @@
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/ajit421/github_status)
 
-[**✨ Open Live Card Builder ✨**](https://ajit421.github.io/github_status/card-builder.html)
+<a href="https://ajit421.github.io/github_status/">
+  <img src="https://img.shields.io/badge/✨%20Open%20Card%20Builder-Live%20Interactive%20Tool-58a6ff?style=for-the-badge&logo=github" alt="Open Interactive Builder" />
+</a>
+
+<br/><br/>
 
 <table>
   <tr>
     <td align="center">
-      <b>GitHub Stats</b><br/>
+      <b>📊 GitHub Stats</b><br/>
       <img src="https://github-stats-api.421mrdark.workers.dev/api/stats?username=ajit421&theme=tokyonight" alt="GitHub Stats" width="400" />
     </td>
     <td align="center">
-      <b>Top Languages</b><br/>
+      <b>🌐 Top Languages</b><br/>
       <img src="https://github-stats-api.421mrdark.workers.dev/api/top-langs?username=ajit421&theme=tokyonight" alt="Top Languages" width="400" />
     </td>
   </tr>
   <tr>
     <td align="center">
-      <b>Streak Stats</b><br/>
+      <b>🔥 Streak Stats</b><br/>
       <img src="https://github-stats-api.421mrdark.workers.dev/api/streak?username=ajit421&theme=tokyonight" alt="Streak Stats" width="400" />
     </td>
     <td align="center">
-      <b>Commit Activity</b><br/>
+      <b>📈 Commit Activity</b><br/>
       <img src="https://github-stats-api.421mrdark.workers.dev/api/commit-activity?username=ajit421&theme=tokyonight" alt="Commit Activity" width="400" />
     </td>
   </tr>
@@ -52,140 +56,167 @@
 
 ---
 
+## ⚡ Enable the Builder in 60 Seconds
+
+1. **Fork this repo** (or use your deployed copy)
+2. Go to **Settings → Pages → Source:** `main` branch, `/docs` folder → **Save**
+3. Wait ~60 seconds, then visit:
+   ```
+   https://YOUR_USERNAME.github.io/github_status/
+   ```
+4. **Done.** No external services, no accounts, no API keys needed in the builder itself.
+
+---
+
 ## 📊 Cards Overview
 
 | Card | Endpoint | Auth Required | Description |
-| :--- | :--- | :--- | :--- |
-| **GitHub Stats** | `/api/stats` | Optional | Displays total stars, commits, PRs, issues, and contributions. |
-| **Top Languages** | `/api/top-langs` | Optional | Shows your most used languages in a normal, compact, or pie chart layout. |
-| **Streak Stats** | `/api/streak` | **Yes** (GraphQL) | Highlights your current commit streak, longest streak, and total contributions. |
-| **Commit Activity** | `/api/commit-activity` | Optional | Visualizes your commit history over the last year as an activity graph. |
+| :--- | :--- | :---: | :--- |
+| **📊 GitHub Stats** | `/api/stats` | Optional | Total stars, commits, PRs, issues, and rank |
+| **🌐 Top Languages** | `/api/top-langs` | Optional | Most-used languages (normal, compact, or pie layout) |
+| **🔥 Streak Stats** | `/api/streak` | **Yes** (GraphQL) | Current streak, longest streak, total contributions |
+| **📈 Commit Activity** | `/api/commit-activity` | Optional | Commit history visualized by hour and day-of-week |
 
 ---
 
-## 🎨 Live Card Builder
+## 🎨 Card Builder Platform
 
-> **💡 The Easiest Way to Create Your Cards!**
-> 
-> Stop guessing parameter names and hex codes. Use the interactive visual builder to customize your cards in real-time, then copy the markdown directly.
+<div align="center">
 
-**MODE A — Use the Hosted Builder:**
-Visit the live builder at: [https://ajit421.github.io/github_status/card-builder.html](https://ajit421.github.io/github_status/card-builder.html) (assuming hosted on gh-pages).
+<table>
+<tr><td>
 
-**MODE B — Self-Host:**
-Simply copy the `card-builder.html` file to your repository's `gh-pages` branch or open it directly in your browser. No build steps required!
+> 🚀 **This repo includes a full interactive card builder.**
+> No third-party websites. Hosted directly on GitHub Pages from this repository.
+> Customize every parameter visually, see a live preview, and copy embed code instantly.
 
----
+</td></tr>
+</table>
 
-## 🚀 Quick Start
+</div>
 
-1. **Clone the repo**
-   ```bash
-   git clone https://github.com/ajit421/github_status.git && cd github_status && npm install
-   ```
-2. **Set your GitHub Token** (Needs `read:user` and `repo` scopes)
-   ```bash
-   npx wrangler secret put GITHUB_TOKEN
-   ```
-3. **Deploy to Cloudflare**
-   ```bash
-   npm run deploy
-   ```
+### Setup Instructions — GitHub Pages
 
----
+**Step 1.** Go to your repo → **Settings** → **Pages** (in the left sidebar)
 
-## 📖 Full Parameter Reference
+**Step 2.** Under **Source**, select **Deploy from a branch**
 
-<details>
-<summary><b>1. GitHub Stats (<code>/api/stats</code>)</b></summary>
+**Step 3.** Set **Branch** to `main` and **Folder** to `/docs` → click **Save**
 
-| Parameter | Type | Default | Description | Example Value |
-| :--- | :--- | :--- | :--- | :--- |
-| `username` | `string` | — | **Required.** GitHub username | `ajit421` |
-| `theme` | `string` | `default` | Color theme for the card | `tokyonight` |
-| `hide_rank` | `boolean` | `false` | Hide the rank circle badge | `true` |
-| `show_icons` | `boolean` | `true` | Show icons next to stat names | `false` |
-| `hide_border` | `boolean` | `false` | Hide the outer border of the card | `true` |
-| `custom_title` | `string` | `[Name]'s GitHub Stats` | Override the card title text | `My Awesome Stats` |
-| `bg_color` | `hex` | *theme default* | Background color override (no `#`) | `0d1117` |
-| `text_color` | `hex` | *theme default* | Text color override (no `#`) | `e6edf3` |
-| `title_color` | `hex` | *theme default* | Title color override (no `#`) | `58a6ff` |
-| `icon_color` | `hex` | *theme default* | Icon color override (no `#`) | `3fb950` |
-| `border_color` | `hex` | *theme default* | Border color override (no `#`) | `30363d` |
+**Step 4.** Wait ~2 minutes for GitHub to deploy
 
-</details>
-
-<details>
-<summary><b>2. Top Languages (<code>/api/top-langs</code>)</b></summary>
-
-| Parameter | Type | Default | Description | Example Value |
-| :--- | :--- | :--- | :--- | :--- |
-| `username` | `string` | — | **Required.** GitHub username | `ajit421` |
-| `theme` | `string` | `default` | Color theme for the card | `tokyonight` |
-| `layout` | `string` | `normal` | Layout style (`normal`, `compact`, `pie`) | `compact` |
-| `hide_border` | `boolean` | `false` | Hide the outer border of the card | `true` |
-| `bg_color` | `hex` | *theme default* | Background color override (no `#`) | `0d1117` |
-| `text_color` | `hex` | *theme default* | Text color override (no `#`) | `e6edf3` |
-| `title_color` | `hex` | *theme default* | Title color override (no `#`) | `58a6ff` |
-| `border_color` | `hex` | *theme default* | Border color override (no `#`) | `30363d` |
-
-</details>
-
-<details>
-<summary><b>3. Streak Stats (<code>/api/streak</code>)</b></summary>
-
-| Parameter | Type | Default | Description | Example Value |
-| :--- | :--- | :--- | :--- | :--- |
-| `username` | `string` | — | **Required.** GitHub username | `ajit421` |
-| `theme` | `string` | `default` | Color theme for the card | `radical` |
-| `hide_border` | `boolean` | `false` | Hide the outer border of the card | `true` |
-| `bg_color` | `hex` | *theme default* | Background color override (no `#`) | `0d1117` |
-| `text_color` | `hex` | *theme default* | Text color override (no `#`) | `e6edf3` |
-| `title_color` | `hex` | *theme default* | Title color override (no `#`) | `58a6ff` |
-| `icon_color` | `hex` | *theme default* | Icon color override (no `#`) | `3fb950` |
-| `border_color` | `hex` | *theme default* | Border color override (no `#`) | `30363d` |
-
-</details>
-
-<details>
-<summary><b>4. Commit Activity (<code>/api/commit-activity</code>)</b></summary>
-
-| Parameter | Type | Default | Description | Example Value |
-| :--- | :--- | :--- | :--- | :--- |
-| `username` | `string` | — | **Required.** GitHub username | `ajit421` |
-| `theme` | `string` | `default` | Color theme for the card | `dark` |
-| `hide_border` | `boolean` | `false` | Hide the outer border of the card | `true` |
-| `bg_color` | `hex` | *theme default* | Background color override (no `#`) | `0d1117` |
-| `text_color` | `hex` | *theme default* | Text color override (no `#`) | `e6edf3` |
-| `title_color` | `hex` | *theme default* | Title color override (no `#`) | `58a6ff` |
-| `border_color` | `hex` | *theme default* | Border color override (no `#`) | `30363d` |
-
-</details>
+**Step 5.** Visit **https://YOUR_USERNAME.github.io/github_status/** — your builder is live!
 
 ---
 
-## 🎨 Themes Gallery
+### 📌 Visual Parameter Reference
+
+#### 1. GitHub Stats Card — `/api/stats`
+
+| Category | Parameters |
+| :--- | :--- |
+| 📌 **Required** | <kbd>?username=</kbd> |
+| 🎨 **Appearance** | <kbd>?theme=</kbd> &nbsp; <kbd>?hide_border=true</kbd> |
+| 🔧 **Options** | <kbd>?custom_title=</kbd> &nbsp; <kbd>?hide_rank=true</kbd> &nbsp; <kbd>?show_icons=false</kbd> |
+| 🎯 **Color Overrides** | <kbd>?bg_color=</kbd> &nbsp; <kbd>?text_color=</kbd> &nbsp; <kbd>?title_color=</kbd> &nbsp; <kbd>?icon_color=</kbd> &nbsp; <kbd>?border_color=</kbd> |
+
+#### 2. Top Languages Card — `/api/top-langs`
+
+| Category | Parameters |
+| :--- | :--- |
+| 📌 **Required** | <kbd>?username=</kbd> |
+| 🎨 **Appearance** | <kbd>?theme=</kbd> &nbsp; <kbd>?hide_border=true</kbd> |
+| 🔧 **Options** | <kbd>?layout=normal</kbd> &nbsp; <kbd>?layout=compact</kbd> &nbsp; <kbd>?layout=pie</kbd> |
+| 🎯 **Color Overrides** | <kbd>?bg_color=</kbd> &nbsp; <kbd>?text_color=</kbd> &nbsp; <kbd>?title_color=</kbd> &nbsp; <kbd>?border_color=</kbd> |
+
+#### 3. Streak Stats Card — `/api/streak`
+
+| Category | Parameters |
+| :--- | :--- |
+| 📌 **Required** | <kbd>?username=</kbd> |
+| 🎨 **Appearance** | <kbd>?theme=</kbd> &nbsp; <kbd>?hide_border=true</kbd> |
+| 🎯 **Color Overrides** | <kbd>?bg_color=</kbd> &nbsp; <kbd>?text_color=</kbd> &nbsp; <kbd>?title_color=</kbd> &nbsp; <kbd>?border_color=</kbd> |
+| ⚠️ **Note** | Requires `GITHUB_TOKEN` configured on server |
+
+#### 4. Commit Activity Card — `/api/commit-activity`
+
+| Category | Parameters |
+| :--- | :--- |
+| 📌 **Required** | <kbd>?username=</kbd> |
+| 🎨 **Appearance** | <kbd>?theme=</kbd> &nbsp; <kbd>?hide_border=true</kbd> |
+| 🎯 **Color Overrides** | <kbd>?bg_color=</kbd> &nbsp; <kbd>?text_color=</kbd> &nbsp; <kbd>?title_color=</kbd> &nbsp; <kbd>?border_color=</kbd> |
+
+---
+
+### 🎨 Themes Gallery
 
 <table>
   <tr>
     <td align="center">
       <b>default</b><br/>
-      <img src="https://github-stats-api.421mrdark.workers.dev/api/stats?username=ajit421&theme=default" width="200" alt="default theme" />
+      <img src="https://github-stats-api.421mrdark.workers.dev/api/stats?username=ajit421&theme=default" width="220" alt="default theme" />
     </td>
     <td align="center">
       <b>dark</b><br/>
-      <img src="https://github-stats-api.421mrdark.workers.dev/api/stats?username=ajit421&theme=dark" width="200" alt="dark theme" />
+      <img src="https://github-stats-api.421mrdark.workers.dev/api/stats?username=ajit421&theme=dark" width="220" alt="dark theme" />
     </td>
     <td align="center">
       <b>tokyonight</b><br/>
-      <img src="https://github-stats-api.421mrdark.workers.dev/api/stats?username=ajit421&theme=tokyonight" width="200" alt="tokyonight theme" />
+      <img src="https://github-stats-api.421mrdark.workers.dev/api/stats?username=ajit421&theme=tokyonight" width="220" alt="tokyonight theme" />
     </td>
     <td align="center">
       <b>radical</b><br/>
-      <img src="https://github-stats-api.421mrdark.workers.dev/api/stats?username=ajit421&theme=radical" width="200" alt="radical theme" />
+      <img src="https://github-stats-api.421mrdark.workers.dev/api/stats?username=ajit421&theme=radical" width="220" alt="radical theme" />
     </td>
   </tr>
 </table>
+
+---
+
+### 📋 Copy-Paste Ready Templates
+
+> Replace `YOUR_USERNAME` with your GitHub username.
+
+**📊 GitHub Stats**
+```markdown
+![GitHub Stats](https://github-stats-api.421mrdark.workers.dev/api/stats?username=YOUR_USERNAME&theme=tokyonight&hide_border=true)
+```
+
+**🌐 Top Languages**
+```markdown
+![Top Languages](https://github-stats-api.421mrdark.workers.dev/api/top-langs?username=YOUR_USERNAME&theme=tokyonight&hide_border=true)
+```
+
+**🔥 Streak Stats**
+```markdown
+![Streak Stats](https://github-stats-api.421mrdark.workers.dev/api/streak?username=YOUR_USERNAME&theme=tokyonight&hide_border=true)
+```
+
+**📈 Commit Activity**
+```markdown
+![Commit Activity](https://github-stats-api.421mrdark.workers.dev/api/commit-activity?username=YOUR_USERNAME&theme=tokyonight&hide_border=true)
+```
+
+---
+
+## 🚀 Quick Start
+
+**1. Clone & install**
+```bash
+git clone https://github.com/ajit421/github_status.git
+cd github_status
+npm install
+```
+
+**2. Set your GitHub Token** *(needs `read:user` and `repo` scopes)*
+```bash
+npx wrangler secret put GITHUB_TOKEN
+```
+
+**3. Deploy to Cloudflare**
+```bash
+npm run deploy
+```
 
 ---
 
@@ -216,19 +247,24 @@ flowchart LR
 ## 🛠️ Local Development
 
 ```bash
-npm run dev        # Start wrangler dev server at :8787
-npm run deploy     # Bundle and deploy to Cloudflare
-npm run type-check # Run tsc --noEmit
+npm run dev         # Start wrangler dev server at :8787
+npm run deploy      # Bundle and deploy to Cloudflare
+npm run type-check  # Run tsc --noEmit
 ```
 
 ### Project Structure
+
 ```text
 github_status/
+├── docs/
+│   └── index.html       # Interactive card builder (GitHub Pages)
 ├── src/
 │   ├── config/          # Constants, theme definitions
 │   ├── routes/          # Hono route handlers
 │   ├── services/        # GitHub API fetchers & logic
 │   ├── templates/       # Satori JSX components
+│   │   ├── cards/       # StatsCard, LanguageCard, StreakCard, ActivityCard
+│   │   └── components/  # Icon, StatRow, RankCircle, DonutChart
 │   ├── types/           # TypeScript definitions
 │   ├── utils/           # Helpers, formatters, caching
 │   └── index.ts         # Main worker entrypoint
@@ -242,4 +278,4 @@ github_status/
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License — see the `LICENSE` file for details.
