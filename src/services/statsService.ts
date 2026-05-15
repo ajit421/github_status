@@ -1,6 +1,7 @@
 // src/services/statsService.ts
 import { githubFetch } from '../lib/github';
 import type { GitHubUser, GitHubRepo, CommitSearchResult, StatsData } from '../types/github';
+import { REPOS_PER_PAGE, GITHUB_FETCH_TIMEOUT_MS } from '../config/constants';
 
 interface IssueSearchResult {
   total_count: number;
@@ -16,15 +17,19 @@ function calcRank(score: number): string {
 }
 
 export async function getStats(username: string, token?: string): Promise<StatsData> {
+  // AbortSignal.timeout ensures no single fetch can stall the Worker beyond
+  // the CPU time limit. 8 s gives GitHub enough headroom on slow days.
+  const signal = () => ({ signal: AbortSignal.timeout(GITHUB_FETCH_TIMEOUT_MS) });
+
   const [user, repos, commitSearch] = await Promise.all([
-    githubFetch<GitHubUser>(`/users/${username}`, token),
-    githubFetch<GitHubRepo[]>(`/users/${username}/repos?per_page=100&type=owner`, token),
-    githubFetch<CommitSearchResult>(`/search/commits?q=author:${username}&per_page=1`, token),
+    githubFetch<GitHubUser>(`/users/${username}`, token, signal()),
+    githubFetch<GitHubRepo[]>(`/users/${username}/repos?per_page=${REPOS_PER_PAGE}&type=owner`, token, signal()),
+    githubFetch<CommitSearchResult>(`/search/commits?q=author:${username}&per_page=1`, token, signal()),
   ]);
 
   const [prSearch, issueSearch] = await Promise.all([
-    githubFetch<IssueSearchResult>(`/search/issues?q=author:${username}+type:pr&per_page=1`, token),
-    githubFetch<IssueSearchResult>(`/search/issues?q=author:${username}+type:issue&per_page=1`, token),
+    githubFetch<IssueSearchResult>(`/search/issues?q=author:${username}+type:pr&per_page=1`, token, signal()),
+    githubFetch<IssueSearchResult>(`/search/issues?q=author:${username}+type:issue&per_page=1`, token, signal()),
   ]);
 
   const totalStars   = repos.reduce((sum, r) => sum + r.stargazers_count, 0);

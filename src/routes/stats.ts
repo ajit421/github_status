@@ -2,56 +2,48 @@
 import { Hono } from 'hono';
 import type { Env } from '../types/bindings';
 import { getStats } from '../services/statsService';
-import { withCache, buildCacheKey, CACHE_TTL } from '../lib/cache';
-import { StatsCard } from '../templates/StatsCard';
-import { ErrorCard } from '../templates/ErrorCard';
+import { withCache, buildCacheKey } from '../lib/cache';
+import { CACHE_TTL } from '../config/constants';
+import { StatsCard } from '../templates/cards/StatsCard';
+import { ErrorCard } from '../templates/cards/ErrorCard';
 import { renderCard } from '../templates/renderCard';
-import { THEMES, type ThemeName } from '../lib/themes';
+import {
+  resolveTheme,
+  buildSvgHeaders,
+  getErrorStatus,
+} from '../utils/params';
+import { UserNotFoundError, RateLimitError } from '../lib/errors';
 
 const route = new Hono<{ Bindings: Env }>();
-
 const TTL = CACHE_TTL.STATS;
 
-const HEADERS_OK: Record<string, string> = {
-  'Content-Type':  'image/svg+xml',
-  'Cache-Control': `public, max-age=${TTL}, s-maxage=${TTL}`,
-};
-const HEADERS_ERR: Record<string, string> = {
-  'Content-Type':  'image/svg+xml',
-  'Cache-Control': 'no-store',
-};
-
-function resolveTheme(raw?: string): ThemeName {
-  return raw && raw in THEMES ? (raw as ThemeName) : 'default';
-}
-
 route.get('/', async (c) => {
-  const token    = c.env.GITHUB_TOKEN;
-  const username = c.req.query('username');
-  const theme    = resolveTheme(c.req.query('theme'));
-
-  if (!username) {
-    const svg = await renderCard(ErrorCard({ message: 'Missing required parameter: username', theme }));
-    return new Response(svg, { status: 400, headers: HEADERS_ERR });
-  }
-
-  const params: Record<string, string | undefined> = {
-    username,
-    theme:        c.req.query('theme'),
-    hide_border:  c.req.query('hide_border'),
-    hide_rank:    c.req.query('hide_rank'),
-    show_icons:   c.req.query('show_icons'),
-    custom_title: c.req.query('custom_title'),
-    bg_color:     c.req.query('bg_color'),
-    text_color:   c.req.query('text_color'),
-    title_color:  c.req.query('title_color'),
-    icon_color:   c.req.query('icon_color'),
-    border_color: c.req.query('border_color'),
-  };
+  // Resolve theme early so it is available inside the catch block for the
+  // error card even if username validation throws.
+  const theme = resolveTheme(c.req.query('theme'));
 
   try {
-    const key  = buildCacheKey('stats', params);
-    const data = await withCache(key, TTL, async () => {
+    const username = c.req.query('username');
+    if (!username) throw new UserNotFoundError('Missing required parameter: username');
+
+    const token = c.env.GITHUB_TOKEN;
+
+    const params: Record<string, string | undefined> = {
+      username,
+      theme:        c.req.query('theme'),
+      hide_border:  c.req.query('hide_border'),
+      hide_rank:    c.req.query('hide_rank'),
+      show_icons:   c.req.query('show_icons'),
+      custom_title: c.req.query('custom_title'),
+      bg_color:     c.req.query('bg_color'),
+      text_color:   c.req.query('text_color'),
+      title_color:  c.req.query('title_color'),
+      icon_color:   c.req.query('icon_color'),
+      border_color: c.req.query('border_color'),
+    };
+
+    const key = buildCacheKey('stats', params);
+    const { data, cacheStatus } = await withCache(key, { ttlSeconds: TTL }, async () => {
       const stats = await getStats(username, token);
       return JSON.stringify(stats);
     });
@@ -72,12 +64,19 @@ route.get('/', async (c) => {
       })
     );
 
-    return new Response(svg, { headers: HEADERS_OK });
+    return new Response(svg, {
+      headers: { ...buildSvgHeaders(TTL), 'X-Cache-Status': cacheStatus },
+    });
   } catch (err) {
-    console.error(`[stats] Error for ${username}:`, err);
+    console.error('[stats] Error:', err);
     const message = err instanceof Error ? err.message : 'Failed to fetch GitHub stats';
     const svg = await renderCard(ErrorCard({ message, theme }));
-    return new Response(svg, { status: 500, headers: HEADERS_ERR });
+    const status = getErrorStatus(err);
+    const headers: Record<string, string> = { ...buildSvgHeaders(0, true), 'X-Cache-Status': 'MISS' };
+    if (err instanceof RateLimitError && err.resetTimestamp) {
+      headers['Retry-After'] = String(err.resetTimestamp);
+    }
+    return new Response(svg, { status, headers });
   }
 });
 

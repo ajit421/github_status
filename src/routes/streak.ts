@@ -2,48 +2,34 @@
 import { Hono } from 'hono';
 import type { Env } from '../types/bindings';
 import { fetchContributionData } from '../services/contributionService';
-import { withCache, buildCacheKey, CACHE_TTL } from '../lib/cache';
-import { StreakCard } from '../templates/StreakCard';
-import { ErrorCard } from '../templates/ErrorCard';
+import { withCache, buildCacheKey } from '../lib/cache';
+import { CACHE_TTL } from '../config/constants';
+import { StreakCard } from '../templates/cards/StreakCard';
+import { ErrorCard } from '../templates/cards/ErrorCard';
 import { renderCard } from '../templates/renderCard';
-import { THEMES, type ThemeName } from '../lib/themes';
+import { resolveTheme, buildSvgHeaders, getErrorStatus } from '../utils/params';
+import { UserNotFoundError, RateLimitError } from '../lib/errors';
 
 const route = new Hono<{ Bindings: Env }>();
-
 const TTL = CACHE_TTL.STREAK;
 
-const HEADERS_OK: Record<string, string> = {
-  'Content-Type':  'image/svg+xml',
-  'Cache-Control': `public, max-age=${TTL}, s-maxage=${TTL}`,
-};
-const HEADERS_ERR: Record<string, string> = {
-  'Content-Type':  'image/svg+xml',
-  'Cache-Control': 'no-store',
-};
-
-function resolveTheme(raw?: string): ThemeName {
-  return raw && raw in THEMES ? (raw as ThemeName) : 'default';
-}
-
 route.get('/', async (c) => {
-  const token    = c.env.GITHUB_TOKEN;
-  const username = c.req.query('username');
-  const theme    = resolveTheme(c.req.query('theme'));
-
-  if (!username) {
-    const svg = await renderCard(ErrorCard({ message: 'Missing required parameter: username', theme }));
-    return new Response(svg, { status: 400, headers: HEADERS_ERR });
-  }
-
-  const params: Record<string, string | undefined> = {
-    username,
-    theme:       c.req.query('theme'),
-    hide_border: c.req.query('hide_border'),
-  };
+  const theme = resolveTheme(c.req.query('theme'));
 
   try {
-    const key  = buildCacheKey('streak', params);
-    const data = await withCache(key, TTL, async () => {
+    const username = c.req.query('username');
+    if (!username) throw new UserNotFoundError('Missing required parameter: username');
+
+    const token = c.env.GITHUB_TOKEN;
+
+    const params: Record<string, string | undefined> = {
+      username,
+      theme:       c.req.query('theme'),
+      hide_border: c.req.query('hide_border'),
+    };
+
+    const key = buildCacheKey('streak', params);
+    const { data, cacheStatus } = await withCache(key, { ttlSeconds: TTL }, async () => {
       const streak = await fetchContributionData(username, token);
       return JSON.stringify(streak);
     });
@@ -56,12 +42,19 @@ route.get('/', async (c) => {
       })
     );
 
-    return new Response(svg, { headers: HEADERS_OK });
+    return new Response(svg, {
+      headers: { ...buildSvgHeaders(TTL), 'X-Cache-Status': cacheStatus },
+    });
   } catch (err) {
-    console.error(`[streak] Error for ${username}:`, err);
+    console.error('[streak] Error:', err);
     const message = err instanceof Error ? err.message : 'Failed to fetch streak data';
     const svg = await renderCard(ErrorCard({ message, theme }));
-    return new Response(svg, { status: 500, headers: HEADERS_ERR });
+    const status = getErrorStatus(err);
+    const headers: Record<string, string> = { ...buildSvgHeaders(0, true), 'X-Cache-Status': 'MISS' };
+    if (err instanceof RateLimitError && err.resetTimestamp) {
+      headers['Retry-After'] = String(err.resetTimestamp);
+    }
+    return new Response(svg, { status, headers });
   }
 });
 

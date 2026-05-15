@@ -1,41 +1,33 @@
 // src/services/languageService.ts
 import { githubFetch } from '../lib/github';
 import type { GitHubRepo, LanguageData } from '../types/github';
+import {
+  LANGUAGE_COLORS,
+  LANG_COLOR_FALLBACK,
+  REPOS_PER_PAGE,
+  LANG_REPO_LIMIT,
+  LANG_TOP_N,
+  GITHUB_FETCH_TIMEOUT_MS,
+} from '../config/constants';
 
 type LangBytesMap = Record<string, number>;
 
-const LANG_COLORS: Record<string, string> = {
-  JavaScript:  '#f1e05a',
-  TypeScript:  '#3178c6',
-  Python:      '#3572A5',
-  HTML:        '#e34c26',
-  CSS:         '#563d7c',
-  Vue:         '#41b883',
-  Java:        '#b07219',
-  Go:          '#00ADD8',
-  'C#':        '#178600',
-  PHP:         '#4F5D95',
-  Ruby:        '#701516',
-  Swift:       '#F05138',
-  Rust:        '#dea584',
-  Kotlin:      '#A97BFF',
-  C:           '#555555',
-  'C++':       '#f34b7d',
-  Dart:        '#00B4AB',
-  Shell:       '#89e051',
-};
-
 export async function getTopLanguages(username: string, token?: string): Promise<LanguageData> {
+  const signal = AbortSignal.timeout(GITHUB_FETCH_TIMEOUT_MS);
+
   const repos = await githubFetch<GitHubRepo[]>(
-    `/users/${username}/repos?per_page=100&sort=updated&type=owner`,
-    token
+    `/users/${username}/repos?per_page=${REPOS_PER_PAGE}&sort=updated&type=owner`,
+    token,
+    { signal }
   );
 
-  const top20 = repos.slice(0, 20);
+  const top = repos.slice(0, LANG_REPO_LIMIT);
 
   const langMaps = await Promise.all(
-    top20.map((repo) =>
-      githubFetch<LangBytesMap>(repo.languages_url, token).catch((): LangBytesMap => ({}))
+    top.map((repo) =>
+      githubFetch<LangBytesMap>(repo.languages_url, token, {
+        signal: AbortSignal.timeout(GITHUB_FETCH_TIMEOUT_MS),
+      }).catch((): LangBytesMap => ({}))
     )
   );
 
@@ -46,13 +38,14 @@ export async function getTopLanguages(username: string, token?: string): Promise
     }
   }
 
-  const top5 = Object.entries(aggregated)
+  const topN = Object.entries(aggregated)
     .sort(([, a], [, b]) => b - a)
-    .slice(0, 5);
+    .slice(0, LANG_TOP_N);
 
   const result: LanguageData = {};
-  for (const [lang, size] of top5) {
-    result[lang] = { size, color: LANG_COLORS[lang] ?? '#858585' };
+  for (const [lang, size] of topN) {
+    // LANGUAGE_COLORS is the centralised map; LANG_COLOR_FALLBACK for unknowns
+    result[lang] = { size, color: LANGUAGE_COLORS[lang] ?? LANG_COLOR_FALLBACK };
   }
 
   return result;

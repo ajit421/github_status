@@ -1,15 +1,23 @@
 // src/lib/github.ts
-
-const GITHUB_API_BASE = 'https://api.github.com';
-const GITHUB_GRAPHQL_URL = 'https://api.github.com/graphql';
+import {
+  GITHUB_API_BASE,
+  GITHUB_GRAPHQL_URL,
+  GITHUB_API_VERSION,
+  GITHUB_USER_AGENT,
+} from '../config/constants';
+import {
+  UserNotFoundError,
+  RateLimitError,
+  UpstreamApiError,
+} from './errors';
 
 export { GITHUB_GRAPHQL_URL };
 
 function buildHeaders(token?: string): Record<string, string> {
   const headers: Record<string, string> = {
     Accept: 'application/vnd.github+json',
-    'X-GitHub-Api-Version': '2022-11-28',
-    'User-Agent': 'github-stats-api/2.0 (Cloudflare-Workers)',
+    'X-GitHub-Api-Version': GITHUB_API_VERSION,
+    'User-Agent': GITHUB_USER_AGENT,
   };
   if (token) {
     headers.Authorization = `Bearer ${token}`;
@@ -20,9 +28,9 @@ function buildHeaders(token?: string): Record<string, string> {
 /**
  * Typed fetch wrapper for the GitHub REST API.
  *
- * @param path   Absolute URL or path relative to https://api.github.com
- * @param token  Optional GitHub Personal Access Token
- * @param init   Additional fetch options (method, body, etc.)
+ * @param path  Absolute URL or path relative to https://api.github.com
+ * @param token Optional GitHub PAT
+ * @param init  Additional fetch options (method, body, signal, etc.)
  */
 export async function githubFetch<T>(
   path: string,
@@ -41,18 +49,20 @@ export async function githubFetch<T>(
 
   // Rate-limit telemetry
   const remaining = response.headers.get('x-ratelimit-remaining');
+  const resetHeader = response.headers.get('x-ratelimit-reset');
   if (remaining !== null && Number(remaining) < 10) {
     console.warn(`[github] ⚠️  Rate limit low — ${remaining} requests remaining`);
   }
 
   if (response.status === 403 && remaining === '0') {
-    throw new Error('GitHub API Rate Limit Exceeded. Add a GITHUB_TOKEN to increase limits.');
+    const resetAt = resetHeader ? Number(resetHeader) : undefined;
+    throw new RateLimitError(resetAt);
   }
   if (response.status === 404) {
-    throw new Error(`GitHub user not found`);
+    throw new UserNotFoundError();
   }
   if (!response.ok) {
-    throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
+    throw new UpstreamApiError(response.status, response.statusText);
   }
 
   return response.json() as Promise<T>;
@@ -65,21 +75,23 @@ export async function githubFetch<T>(
 export async function githubGraphQL<T>(
   query: string,
   variables: Record<string, unknown>,
-  token: string
+  token: string,
+  init: RequestInit = {}
 ): Promise<T> {
   const response = await fetch(GITHUB_GRAPHQL_URL, {
     method: 'POST',
+    ...init,
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
       Authorization: `Bearer ${token}`,
-      'User-Agent': 'github-stats-api/2.0 (Cloudflare-Workers)',
+      'User-Agent': GITHUB_USER_AGENT,
     },
     body: JSON.stringify({ query, variables }),
   });
 
   if (!response.ok) {
-    throw new Error(`GitHub GraphQL error: ${response.status} ${response.statusText}`);
+    throw new UpstreamApiError(response.status, response.statusText);
   }
 
   return response.json() as Promise<T>;
