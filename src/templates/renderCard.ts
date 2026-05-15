@@ -1,22 +1,19 @@
 // src/templates/renderCard.ts
 import satori from 'satori';
+import { FONT_URLS, FONT_CACHE_TTL_SECONDS } from '../config/constants';
 
 // ── Module-level font cache ───────────────────────────────────────────────────
 // ArrayBuffers stored here survive for the full lifetime of a single Worker
-// instance (which can handle thousands of requests). Most requests after the
+// isolate (which can handle thousands of requests). Most requests after the
 // first will hit this in-memory cache and skip all network I/O.
+// Resetting the isolate naturally clears this cache, which is correct behaviour.
 let regularFontData: ArrayBuffer | null = null;
 let semiBoldFontData: ArrayBuffer | null = null;
-
-const FONT_URLS = {
-  regular: 'https://unpkg.com/@fontsource/inter@5.0.19/files/inter-latin-400-normal.woff',
-  semiBold: 'https://unpkg.com/@fontsource/inter@5.0.19/files/inter-latin-600-normal.woff',
-} as const;
 
 /**
  * Fetches a font file using a two-layer cache strategy:
  *
- * Layer 1: Cloudflare Cache API (edge-level, cross-instance, 30-day TTL).
+ * Layer 1: Cloudflare Cache API (edge-level, cross-instance).
  *   - If another Worker instance already fetched this font, it's in the edge
  *     cache and we avoid a CDN round-trip entirely.
  *
@@ -50,15 +47,17 @@ async function fetchFont(url: string, cacheKey: string): Promise<ArrayBuffer> {
   // Read the body ONCE into an ArrayBuffer
   const buffer = await response.arrayBuffer();
 
-  // Write a COPY to Cache API (best-effort, 30-day TTL)
-  // buffer.slice(0) creates a copy so we can pass it to both cache and caller
+  // Write a COPY to Cache API (best-effort)
+  // buffer.slice(0) creates a copy so we can pass it to both cache and caller.
+  // This is necessary because some JS runtimes detach the original ArrayBuffer
+  // when it is passed to the Response constructor, making it unusable later.
   try {
     await cache.put(
       cacheUrl,
       new Response(buffer.slice(0), {
         headers: {
           'Content-Type': 'font/woff',
-          'Cache-Control': 'public, max-age=2592000', // 30 days
+          'Cache-Control': `public, max-age=${FONT_CACHE_TTL_SECONDS}`,
         },
       })
     );
@@ -91,6 +90,15 @@ async function loadFonts(): Promise<[ArrayBuffer, ArrayBuffer]> {
 }
 
 /**
+ * Clears the module-level font cache.
+ * Useful for test resets or forcing a re-fetch without restarting the isolate.
+ */
+export function clearFontCache(): void {
+  regularFontData = null;
+  semiBoldFontData = null;
+}
+
+/**
  * Renders a Hono JSX element to an SVG string via Satori.
  *
  * The `element` parameter is typed as `any` for two reasons:
@@ -103,11 +111,22 @@ async function loadFonts(): Promise<[ArrayBuffer, ArrayBuffer]> {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function renderCard(element: any, width = 495, height = 195): Promise<string> {
+  return renderCardWithSize(element, { width, height });
+}
+
+/**
+ * Convenience overload that accepts an options object for custom sizes.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function renderCardWithSize(
+  element: any,
+  options: { width?: number; height?: number } = {}
+): Promise<string> {
   const [regular, semiBold] = await loadFonts();
 
   return satori(element, {
-    width,
-    height,
+    width: options.width ?? 495,
+    height: options.height ?? 195,
     fonts: [
       { name: 'Inter', data: regular,  weight: 400, style: 'normal' },
       { name: 'Inter', data: semiBold, weight: 600, style: 'normal' },
