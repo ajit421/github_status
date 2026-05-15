@@ -5,7 +5,10 @@
   "scripts": {
     "dev":        "wrangler dev",
     "deploy":     "wrangler deploy",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "lint":       "tsc --noEmit && echo 'Type check passed'",
+    "cf:tail":    "wrangler tail",
+    "cf:secrets": "wrangler secret list"
   },
   "dependencies": {
     "hono":   "^4.12.9",

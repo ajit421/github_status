@@ -71,7 +71,7 @@ Replace `YOUR_USERNAME` with your GitHub username and `https://github-stats-api.
 ### 1. GitHub Stats Card
 
 ```markdown
-![GitHub Stats](https://https://github-stats-api.421mrdark.workers.dev/api/stats?username=YOUR_USERNAME&theme=tokyonight&show_icons=true&hide_border=true)
+![GitHub Stats](https://github-stats-api.421mrdark.workers.dev/api/stats?username=ajit421&theme=tokyonight&show_icons=true&hide_border=true)
 ```
 
 | Parameter | Description | Default |
@@ -93,7 +93,7 @@ Replace `YOUR_USERNAME` with your GitHub username and `https://github-stats-api.
 ### 2. Top Languages Card
 
 ```markdown
-![Top Languages](https://https://github-stats-api.421mrdark.workers.dev/api/top-langs?username=YOUR_USERNAME&theme=tokyonight&layout=pie&hide_border=true)
+![Top Languages](https://github-stats-api.421mrdark.workers.dev/api/top-langs?username=ajit421&theme=tokyonight&layout=pie&hide_border=true)
 ```
 
 | Parameter | Description | Default |
@@ -110,7 +110,7 @@ Replace `YOUR_USERNAME` with your GitHub username and `https://github-stats-api.
 > ⚠️ Requires `GITHUB_TOKEN` — uses the GitHub GraphQL API.
 
 ```markdown
-![GitHub Streak](https://https://github-stats-api.421mrdark.workers.dev/api/streak?username=YOUR_USERNAME&theme=tokyonight&hide_border=true)
+![GitHub Streak](https://github-stats-api.421mrdark.workers.dev/api/streak?username=ajit421&theme=tokyonight&hide_border=true)
 ```
 
 | Parameter | Description | Default |
@@ -124,7 +124,7 @@ Replace `YOUR_USERNAME` with your GitHub username and `https://github-stats-api.
 ### 4. Commit Activity Card
 
 ```markdown
-![Commit Activity](https://https://github-stats-api.421mrdark.workers.dev/api/commit-activity?username=YOUR_USERNAME&theme=tokyonight&hide_border=true)
+![Commit Activity](https://github-stats-api.421mrdark.workers.dev/api/commit-activity?username=ajit421&theme=tokyonight&hide_border=true)
 ```
 
 | Parameter | Description | Default |
@@ -151,7 +151,7 @@ Pass as `?theme=tokyonight` on any endpoint.
 Override individual colors with hex codes (no `#`):
 
 ```markdown
-![Custom Stats](https://https://github-stats-api.421mrdark.workers.dev/api/stats?username=YOUR_USERNAME&bg_color=0d1117&text_color=58a6ff&title_color=58a6ff&icon_color=58a6ff&hide_border=true)
+![Custom Stats](https://github-stats-api.421mrdark.workers.dev/api/stats?username=ajit421&bg_color=0d1117&text_color=58a6ff&title_color=58a6ff&icon_color=58a6ff&hide_border=true)
 ```
 
 ---
@@ -187,35 +187,4 @@ GitHub API → Service → Cloudflare Cache API → Satori (JSX → SVG) → Res
 npm run dev        # Start wrangler dev server at :8787
 npm run deploy     # Bundle and deploy to Cloudflare
 npm run type-check # Run tsc --noEmit
-```
-
-### Project Structure
-
-```
-src/
-├── index.ts              # CF Workers entry point (Hono app)
-├── types/
-│   ├── bindings.d.ts     # Cloudflare env bindings (Env interface)
-│   └── github.d.ts       # GitHub API response types
-├── lib/
-│   ├── github.ts         # Typed fetch wrappers (REST + GraphQL)
-│   ├── cache.ts          # Cloudflare Cache API wrapper
-│   └── themes.ts         # Theme color definitions
-├── services/
-│   ├── statsService.ts
-│   ├── languageService.ts
-│   ├── contributionService.ts
-│   └── activityService.ts
-├── templates/
-│   ├── renderCard.ts     # Satori renderer + font cache
-│   ├── StatsCard.tsx
-│   ├── LanguageCard.tsx
-│   ├── StreakCard.tsx
-│   ├── ActivityCard.tsx
-│   └── ErrorCard.tsx
-└── routes/
-    ├── stats.ts
-    ├── langs.ts
-    ├── streak.ts
-    └── activity.ts
 ```
