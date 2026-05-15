@@ -25,3 +25,7 @@ compatibility_flags = ["nodejs_compat"]
 # ── Local dev overrides ───────────────────────────────────────────────────────
 [dev]
 port = 8787
+
+# ── Observability (Logpush / wrangler tail) ───────────────────────────────────
+[observability]
+enabled = true
