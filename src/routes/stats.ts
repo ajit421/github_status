@@ -26,7 +26,7 @@ route.get('/', async (c) => {
     const username = c.req.query('username');
     if (!username) throw new UserNotFoundError('Missing required parameter: username');
 
-    const token = c.env.GITHUB_TOKEN;
+    const token = c.req.query('token') || c.env.GITHUB_TOKEN;
 
     const params: Record<string, string | undefined> = {
       username,
