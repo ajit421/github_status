@@ -108,8 +108,8 @@ export function LanguageCard({
   const langRows = entries.map(([name, { size, color }]) => ({
     name,
     color,
-    percent: (size / totalBytes) * 100,
-    ratio: size / totalBytes,
+    percent: totalBytes > 0 ? (size / totalBytes) * 100 : 0,
+    ratio: totalBytes > 0 ? size / totalBytes : 0,
   }));
 
   const isCompact = layout === "compact";
